@@ -1,0 +1,32 @@
+{
+  "name": "travel-app-server",
+  "version": "1.0.0",
+  "description": "travel app server",
+  "private": true,
+  "main": "app.ts",
+  "scripts": {
+    "start": "node dist/bin/www.js",
+    "server": "nodemon dist/bin/www.js",
+    "postinstall": "tsc && node cp public dist/ && mkdirp ./dist/uploads",
+    "postinstall:watch": "tsc -w && node cp \"public\" \"dist/\" && mkdirp ./dist/uploads"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "global-agent": "^2.1.12",
+    "mkdirp": "^1.0.4",
+    "mongoose": "^5.11.15",
+    "multer": "^1.4.2",
+    "shelljs": "^0.8.4",
+    "typescript": "^4.1.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "engines": {
+    "node": "12.14.0"
+  }
+}
