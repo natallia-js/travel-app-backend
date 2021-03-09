@@ -11,6 +11,7 @@ export interface IUserRating extends Document {
 }
 
 export interface ISight extends Document {
+  name: Array<ILangStringValue>;
   description: Array<ILangStringValue>;
   photoUrl: string;
   userRating: Array<IUserRating>;
@@ -48,6 +49,12 @@ const CountrySchema: Schema = new Schema({
   videoUrl: { type: String, required: true },
   sights: [
     {
+      name: [
+        {
+          lang: { type: String, required: true },
+          value: { type: String, required: true }
+        }
+      ],
       description: [
         {
           lang: { type: String, required: true },
