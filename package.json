@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node dist/bin/www.js",
     "server": "nodemon dist/bin/www.js",
-    "postinstall": "tsc && node cp public dist/ && mkdirp ./dist/uploads",
-    "postinstall:watch": "tsc -w && node cp \"public\" \"dist/\" && mkdirp ./dist/uploads"
+    "postinstall": "tsc && mkdirp ./dist/uploads",
+    "postinstall:watch": "tsc -w && mkdirp ./dist/uploads"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -16,6 +16,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "global-agent": "^2.1.12",
+    "jsonwebtoken": "^8.5.1",
     "mkdirp": "^1.0.4",
     "mongoose": "^5.11.15",
     "multer": "^1.4.2",
