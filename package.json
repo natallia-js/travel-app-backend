@@ -5,7 +5,7 @@
   "private": true,
   "main": "app.ts",
   "scripts": {
-    "start": "node dist/bin/www.js",
+    "start": "cross-env NODE_ENV=production node dist/bin/www.js",
     "server": "nodemon dist/bin/www.js",
     "postinstall": "tsc && mkdirp ./dist/uploads",
     "postinstall:watch": "tsc -w && mkdirp ./dist/uploads"
