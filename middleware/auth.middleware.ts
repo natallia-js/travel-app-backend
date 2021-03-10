@@ -3,7 +3,7 @@ import * as config from 'config';
 import { CONFIG_JWT_SECRET_PARAM_NAME } from '../constants';
 
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   // Справка: HTTP-метод OPTIONS используется для описания параметров соединения с целевым ресурсом.
   //          Клиент может указать особый URL для обработки метода OPTIONS, или * (зведочку) чтобы
   //          указать весь сервер целиком.
