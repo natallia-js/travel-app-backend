@@ -1,3 +1,4 @@
 {
-  "mongoURI": "mongodb://mongo-root:passw0rd@localhost:27017"
+  "mongoURI": "mongodb://mongo-root:passw0rd@localhost:27017",
+  "jwtSecret": "travel app secret jwt key"
 }

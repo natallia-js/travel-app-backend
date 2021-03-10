@@ -25,3 +25,10 @@ export interface ICountry extends Document {
   videoUrl: string;
   sights: Array<ISight>;
 }
+
+export interface IUser extends Document {
+  login: string;
+  password: string;
+  name: string;
+  photoUrl: string;
+}

@@ -1,6 +1,7 @@
 import * as express from 'express';
 import * as cors from 'cors';
 
+import authRouter from './routes/authentication';
 import countriesRouter from './routes/countries';
 
 const app = express();
@@ -9,6 +10,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.use('/auth', authRouter);
 app.use('/todos', countriesRouter);
 
 // catch 404 and forward to error handler
