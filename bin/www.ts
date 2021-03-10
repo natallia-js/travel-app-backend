@@ -1,6 +1,7 @@
-import { app } from '../app';
 import * as config from 'config';
 import * as mongoose from 'mongoose';
+import { app } from '../app';
+import { CONFIG_MONGOURI_PARAM_NAME, DEF_PORT } from '../constants';
 
 /**
  * Normalize a port into a number, string, or false.
@@ -21,14 +22,14 @@ function normalizePort(val) {
   return false;
 }
 
-const PORT = normalizePort(process.env.PORT || '3000');
+const PORT = normalizePort(process.env.PORT || DEF_PORT);
 
 /**
  * Actions to perform to start the server.
  */
 async function start() {
   try {
-    await mongoose.connect(config.get('mongoURI'), {
+    await mongoose.connect(config.get(CONFIG_MONGOURI_PARAM_NAME), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true

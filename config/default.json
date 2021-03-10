@@ -1,3 +1,3 @@
 {
-  "mongoURI": "mongodb://mongo-root:passw0rd@localhost:27017"
+  "mongoURI": "mongodb+srv://TravelAppUser:TravelAppUserPassword@travelappcluster.httwj.mongodb.net/travelAppDB?retryWrites=true&w=majority"
 }
