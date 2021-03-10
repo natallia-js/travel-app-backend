@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
-import { validationResult, check } from 'express-validator';
+import { validationResult, check, body } from 'express-validator';
 import * as config from 'config';
 import * as multer from 'multer';
 import * as uuid from 'uuid';
+import * as path from 'path';
+import * as fs from 'fs';
 import User from '../models/User';
 import { IUser } from '../models/interfaces';
 import { CONFIG_JWT_SECRET_PARAM_NAME, UPLOADED_FILES_RELATIVE_PATH, UPLOADED_FILES_PATH } from '../constants';
@@ -19,9 +21,7 @@ const storage = multer.diskStorage({
     cb(null, UPLOADED_FILES_PATH);
   },
   filename: function (_req_, file, cb) {
-    const tmpArr = file.originalname.split('.');
-    const fileExt = tmpArr.pop();
-    const fileName = uuid.v4() + '.' + fileExt;
+    const fileName = uuid.v4() + path.extname(file.originalname);
     cb(null, fileName);
   }
 });
@@ -29,18 +29,19 @@ const storage = multer.diskStorage({
 /**
  * Типы принимаемых файлов.
  */
-const fileFilter = (_req_, file, cb) => {
+const imageFilter = (req, file, cb) => {
   if (file.mimetype === "image/png" ||
       file.mimetype === "image/jpg"||
       file.mimetype === "image/jpeg") {
     cb(null, true);
   } else {
-    cb(null, false);
+    req.fileValidationError = 'Only image files are allowed!';
+    return cb(new Error('Only image files are allowed!'), false);
   }
 }
 
 // Для загрузки фото пользователей
-const upload = multer({ storage: storage, fileFilter: fileFilter });
+const upload = multer({ storage: storage, fileFilter: imageFilter });
 
 /**
  * Обработка запроса на регистрацию нового пользователя
@@ -51,9 +52,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
  */
 router.post(
   '/register',
-  upload.fields([
-    { name: 'filedata', maxCount: 1 }
-  ]),
+  upload.single('filedata'),
   [
     check('login')
       .isLength({ min: 1 })
@@ -74,14 +73,29 @@ router.post(
   ],
   async (req, res) => {
 
+    const delUploadedFile = () => {
+      if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+          if (err) {
+            // HANLDE ERROR
+          }
+        });
+      }
+    };
+
     try {
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
+        delUploadedFile();
         return res.status(400).json({
           errors: errors.array(),
           message: 'Wrong registration data'
         })
+      }
+
+      if (req.fileValidationError) {
+        return res.status(400).json({ message: req.fileValidationError });
       }
 
       const { login, password, name } = req.body;
@@ -89,11 +103,11 @@ router.post(
       const candidate: IUser = await User.findOne({ login });
 
       if (candidate) {
+        delUploadedFile();
         return res.status(400).json({ message: 'User with this login already exists' });
       }
 
-      let filedata: any = req.files['filedata'][0];
-      const photoUrl = filedata ? UPLOADED_FILES_RELATIVE_PATH + filedata.filename : '';
+      const photoUrl = req.file ? UPLOADED_FILES_RELATIVE_PATH + req.file.filename : '';
 
       const hashedPassword: any = await bcrypt.hash(password, 12);
 
@@ -102,10 +116,10 @@ router.post(
       await user.save();
 
       res.status(201).json({ message: 'User successfully registered',
-                             hashedPassword,
                              userId: user._id });
 
     } catch (e) {
+      delUploadedFile();
       res.status(500).json({ message: 'Something went wrong, try again' });
     }
   }
@@ -165,7 +179,8 @@ router.post(
 
       res.status(201).json({ token,
                              userId: user._id,
-                             name: user.name
+                             name: user.name,
+                             photoUrl: user.photoUrl
                           });
 
     } catch (e) {
