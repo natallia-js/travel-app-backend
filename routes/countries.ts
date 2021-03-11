@@ -219,7 +219,15 @@ router.post(
       return res.status(400).json({ message: 'Sight with the given id was not found' });
     }
 
-    res.status(201).json(data);
+    res.status(201).json({
+      id: data._id,
+      sights: data.sights.map(record => {
+        return {
+          id: record._id,
+          userRating: record.userRating,
+        };
+      }),
+    });
 
   } catch (e) {
     res.status(500).json({ message: 'Something went wrong, try again' });
