@@ -20,6 +20,8 @@ export interface ISight extends Document {
 export interface ICountry extends Document {
   name: Array<ILangStringValue>;
   capital: Array<ILangStringValue>;
+  timezone: string;
+  currency: string;
   description: Array<ILangStringValue>;
   photoUrl: string;
   videoUrl: string;

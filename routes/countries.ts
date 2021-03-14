@@ -56,6 +56,8 @@ router.post(
           id: record._id,
           name: record.name.find(el => el.lang === reloadLang).value,
           capital: record.capital.find(el => el.lang === reloadLang).value,
+          currency: record.currency,
+          timezone: record.timezone,
           photoUrl: record.photoUrl,
         };
       }));
@@ -112,6 +114,8 @@ router.post(
         id: data._id,
         name: data.name.find(el => el.lang === reloadLang).value,
         capital: data.capital.find(el => el.lang === reloadLang).value,
+        currency: data.currency,
+        timezone: data.timezone,
         photoUrl: data.photoUrl,
         description: data.description.find(el => el.lang === reloadLang).value,
         videoUrl: data.videoUrl,
@@ -138,7 +142,7 @@ router.post(
 /**
  * Allows to set user's rating for the given sight.
   * Request params:
- *   countryID - the unique id of the country if the sight
+ *   countryID - the unique id of the country of the sight
  *   sightID - the unique id of the sight
  *   userID - the unique id of the user
  *   rating - number 1...5
@@ -228,6 +232,84 @@ router.post(
         };
       }),
     });
+
+  } catch (e) {
+    res.status(500).json({ message: 'Something went wrong, try again' });
+  }
+});
+
+/**
+ * Allows to get timezone for the country capital.
+ * Request params:
+ *   countryID - the unique id of the country
+ */
+router.post(
+  '/timezone',
+  [
+    check('countryID')
+      .exists()
+      .withMessage('countryID param must be set'),
+  ],
+  async (req, res) => {
+
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+        message: 'Incorrect data in timezone request'
+      });
+    }
+
+    let { countryID } = req.body;
+
+    const data: ICountry = await Country.findOne({ _id: countryID });
+
+    if (!data) {
+      return res.status(400).json({ message: 'Country with the given id was not found' });
+    }
+
+    res.status(201).json({ timezone: data.timezone });
+
+  } catch (e) {
+    res.status(500).json({ message: 'Something went wrong, try again' });
+  }
+});
+
+/**
+ * Allows to get currency of the capital.
+ * Request params:
+ *   countryID - the unique id of the country
+ */
+router.post(
+  '/currency',
+  [
+    check('countryID')
+      .exists()
+      .withMessage('countryID param must be set'),
+  ],
+  async (req, res) => {
+
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+        message: 'Incorrect data in currency request'
+      });
+    }
+
+    let { countryID } = req.body;
+
+    const data: ICountry = await Country.findOne({ _id: countryID });
+
+    if (!data) {
+      return res.status(400).json({ message: 'Country with the given id was not found' });
+    }
+
+    res.status(201).json({ currency: data.currency });
 
   } catch (e) {
     res.status(500).json({ message: 'Something went wrong, try again' });
