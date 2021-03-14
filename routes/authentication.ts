@@ -343,11 +343,8 @@ router.post(
  * Параметры тела запроса:
  * userID - id пользователя (обязателен)
  */
-router.post(
-  '/getUserPhoto',
-  [
-    check('userID', 'Enter user id').exists(),
-  ],
+router.get(
+  '/getUserPhoto/:userID',
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -359,7 +356,7 @@ router.post(
         })
       }
 
-      const { userID } = req.body;
+      const userID = req.params.userID;
 
       const user: IUser = await User.findOne({ _id: userID });
 
