@@ -329,6 +329,7 @@ router.post(
       res.status(201).json({ token,
                              userId: user._id,
                              name: user.name,
+                             imgType: user.photo ? user.photo.contentType : null,
                           });
 
     } catch (e) {
