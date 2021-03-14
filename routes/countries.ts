@@ -58,8 +58,8 @@ router.post(
           capital: record.capital.find(el => el.lang === reloadLang).value,
           currency: record.currency,
           timezone: record.timezone,
-          latitude: record.lat,
-          longitude: record.lng,
+          lat: record.lat,
+          lng: record.lng,
           photoUrl: record.photoUrl,
         };
       }));
@@ -118,8 +118,8 @@ router.post(
         capital: data.capital.find(el => el.lang === reloadLang).value,
         currency: data.currency,
         timezone: data.timezone,
-        latitude: data.lat,
-        longitude: data.lng,
+        lat: data.lat,
+        lng: data.lng,
         photoUrl: data.photoUrl,
         description: data.description.find(el => el.lang === reloadLang).value,
         videoUrl: data.videoUrl,
