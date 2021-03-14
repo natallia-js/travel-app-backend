@@ -329,8 +329,49 @@ router.post(
       res.status(201).json({ token,
                              userId: user._id,
                              name: user.name,
-                             photo: user.photo
                           });
+
+    } catch (e) {
+      res.status(500).json({ message: 'Something went wrong, try again' });
+    }
+  }
+);
+
+/**
+ * Обработка запроса на получение фото пользователя.
+ * Параметры тела запроса:
+ * userID - id пользователя (обязателен)
+ */
+router.post(
+  '/getUserPhoto',
+  [
+    check('userID', 'Enter user id').exists(),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(400).json({
+          errors: errors.array(),
+          message: 'Wrong getUserPhoto data'
+        })
+      }
+
+      const { userID } = req.body;
+
+      const user: IUser = await User.findOne({ _id: userID });
+
+      if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+      }
+
+      if (!user.photo) {
+        return res.status(400).json({ message: 'No user photo found' });
+      }
+
+      res.header('Content-Type', user.photo.contentType);
+      res.status(201).send(user.photo.data);
 
     } catch (e) {
       res.status(500).json({ message: 'Something went wrong, try again' });
