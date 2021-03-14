@@ -126,6 +126,91 @@ router.post(
 );
 
 /**
+ * Обработка запроса на регистрацию нового пользователя
+ * Параметры тела запроса:
+ * login - логин пользователя (обязателен),
+ * password - пароль пользователя (обязателен),
+ * name - имя пользователя (обязательно),
+ */
+router.post(
+  '/register2',
+  upload.single('filedata'),
+  [
+    check('login')
+      .isLength({ min: 1 })
+      .withMessage('Minimal login length is 1 symbol')
+      .bail() // stops running validations if any of the previous ones have failed
+      .matches(/^[A-Za-z0-9_]+$/)
+      .withMessage('Only latin letters, numbers and _ sign can be present in login'),
+    check('password')
+      .isLength({ min: 6 })
+      .withMessage('Minimal password length is 6 symbols')
+      .bail()
+      .matches(/^[A-Za-z0-9_]+$/)
+      .withMessage('Only latin letters, numbers and "_" sign can be present in password'),
+    check('name')
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage('Minimal name length is 1 symbol')
+  ],
+  async (req, res) => {
+
+    const delUploadedFile = () => {
+      if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+          if (err) {
+            // HANLDE ERROR
+          }
+        });
+      }
+    };
+
+    try {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        delUploadedFile();
+        return res.status(400).json({
+          errors: errors.array(),
+          message: 'Wrong registration data'
+        })
+      }
+
+      if (req.fileValidationError) {
+        return res.status(400).json({ message: req.fileValidationError });
+      }
+
+      const { login, password, name } = req.body;
+
+      const candidate: IUser = await User.findOne({ login });
+
+      if (candidate) {
+        delUploadedFile();
+        return res.status(400).json({ message: 'User with this login already exists' });
+      }
+
+      const photoData = req.file ? {
+        data: fs.readFileSync(path.join(UPLOADED_FILES_PATH, req.file.filename)),
+        contentType: req.file.mimetype,
+      } : null;
+
+      const hashedPassword: any = await bcrypt.hash(password, 12);
+
+      const user: IUser = new User({ login, password: hashedPassword, name, photo: photoData });
+
+      await user.save();
+
+      res.status(201).json({ message: 'User successfully registered',
+                             userId: user._id });
+
+    } catch (e) {
+      delUploadedFile();
+      res.status(500).json({ message: 'Something went wrong, try again' });
+    }
+  }
+);
+
+/**
  * Обработка запроса на вход в систему.
  * Параметры тела запроса:
  * login - логин пользователя (обязателен),

@@ -30,9 +30,15 @@ export interface ICountry extends Document {
   sights: Array<ISight>;
 }
 
+export interface IPhotoData {
+  data: Buffer;
+  contentType: string;
+}
+
 export interface IUser extends Document {
   login: string;
   password: string;
   name: string;
   photoUrl: string;
+  photo: IPhotoData;
 }

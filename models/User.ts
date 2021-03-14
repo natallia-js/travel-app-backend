@@ -1,4 +1,4 @@
-import { model, Schema, Document } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import { IUser } from './interfaces';
 
 const UserSchema: Schema = new Schema({
@@ -6,6 +6,10 @@ const UserSchema: Schema = new Schema({
   password: { type: String, required: true },
   name: { type: String, required: true },
   photoUrl: { type: String },
+  photo: {
+    data: { type: Buffer },
+    contentType: { type: String },
+  },
 });
 
 // Export the model and return IUser interface
