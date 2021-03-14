@@ -22,6 +22,8 @@ export interface ICountry extends Document {
   capital: Array<ILangStringValue>;
   timezone: string;
   currency: string;
+  lat: number;
+  lng: number;
   description: Array<ILangStringValue>;
   photoUrl: string;
   videoUrl: string;

@@ -17,6 +17,8 @@ const CountrySchema: Schema = new Schema({
   ],
   timezone: { type: String, required: true },
   currency: { type: String, required: true },
+  lat: { type: Number, required: true },
+  lng: { type: Number, required: true },
   description: [
     {
       lang: { type: String, required: true },
