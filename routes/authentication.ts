@@ -9,7 +9,12 @@ import * as path from 'path';
 import * as fs from 'fs';
 import User from '../models/User';
 import { IUser } from '../models/interfaces';
-import { CONFIG_JWT_SECRET_PARAM_NAME, UPLOADED_FILES_RELATIVE_PATH, UPLOADED_FILES_PATH } from '../constants';
+import {
+  CONFIG_JWT_SECRET_PARAM_NAME,
+  UPLOADED_FILES_RELATIVE_PATH,
+  UPLOADED_FILES_PATH,
+  UPLOADED_FILE_MAX_SIZE_IN_BYTES
+} from '../constants';
 
 const router = Router();
 
@@ -41,17 +46,23 @@ const imageFilter = (req, file, cb) => {
 }
 
 // Для загрузки фото пользователей
-const upload = multer({ storage: storage, fileFilter: imageFilter });
+const upload = multer({
+  storage: storage,
+  fileFilter: imageFilter,
+  limits: { fileSize: UPLOADED_FILE_MAX_SIZE_IN_BYTES }
+});
 
 /**
- * Обработка запроса на регистрацию нового пользователя
+ * Обработка запроса на регистрацию нового пользователя.
+ * Файл с изображением пользователя сохраняется в каталоге uploads, в БД
+ * помещается ссылка на данный файл.
  * Параметры тела запроса:
  * login - логин пользователя (обязателен),
  * password - пароль пользователя (обязателен),
  * name - имя пользователя (обязательно),
  */
 router.post(
-  '/register',
+  '/register1',
   upload.single('filedata'),
   [
     check('login')
@@ -126,14 +137,15 @@ router.post(
 );
 
 /**
- * Обработка запроса на регистрацию нового пользователя
+ * Обработка запроса на регистрацию нового пользователя.
+ * Изображение пользователя и его mimeType помещаются в БД.
  * Параметры тела запроса:
  * login - логин пользователя (обязателен),
  * password - пароль пользователя (обязателен),
  * name - имя пользователя (обязательно),
  */
 router.post(
-  '/register2',
+  '/register',
   upload.single('filedata'),
   [
     check('login')
@@ -275,71 +287,7 @@ router.post(
 );
 
 /**
- * Обработка запроса на вход в систему.
- * Параметры тела запроса:
- * login - логин пользователя (обязателен),
- * password - пароль пользователя (обязателен),
- */
-router.post(
-  '/login2',
-  [
-    check('login', 'Enter login').exists(),
-    check('password', 'Enter password').exists()
-  ],
-  async (req, res) => {
-    try {
-      const errors = validationResult(req);
-
-      if (!errors.isEmpty()) {
-        return res.status(400).json({
-          errors: errors.array(),
-          message: 'Wrong authentication data'
-        })
-      }
-
-      const { login, password } = req.body;
-
-      const user: IUser = await User.findOne({ login });
-
-      if (!user) {
-        return res.status(400).json({ message: 'User not found' });
-      }
-
-      const isMatch: any = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Wrong password, try again' });
-      }
-
-      // Создаем JWT-токен (as string) для успешно вошедшего в систему пользователя.
-      // JWT состоит из трех частей: заголовок (header - JSON-объект, содержит информацию о том,
-      // как должна вычисляться JWT подпись), полезные данные (payload) и
-      // подпись (signature - получается так: алгоритм base64url кодирует header и payload, соединяет
-      // закодированные строки через точку, затем полученная строка хешируется алгоритмом, заданном в
-      // header на основе секретного ключа).
-      // Здесь производится synchronous sign with default (HMAC SHA256).
-
-      const token = jwt.sign(
-        {
-          userId: user._id,
-        },
-        config.get(CONFIG_JWT_SECRET_PARAM_NAME)
-      );
-
-      res.status(201).json({ token,
-                             userId: user._id,
-                             name: user.name,
-                             imgType: user.photo ? user.photo.contentType : null,
-                          });
-
-    } catch (e) {
-      res.status(500).json({ message: 'Something went wrong, try again' });
-    }
-  }
-);
-
-/**
- * Обработка запроса на получение фото пользователя.
+ * Обработка запроса на получение фото пользователя (при хранении его в БД).
  * Параметры тела запроса:
  * userID - id пользователя (обязателен)
  */
