@@ -24,6 +24,7 @@ export interface ICountry extends Document {
   currency: string;
   lat: number;
   lng: number;
+  alpha2Code: string;
   description: Array<ILangStringValue>;
   photoUrl: string;
   videoUrl: string;

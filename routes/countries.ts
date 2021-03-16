@@ -60,6 +60,7 @@ router.post(
           timezone: record.timezone,
           lat: record.lat,
           lng: record.lng,
+          alpha2Code: record.alpha2Code,
           photoUrl: record.photoUrl,
         };
       }));
@@ -120,6 +121,7 @@ router.post(
         timezone: data.timezone,
         lat: data.lat,
         lng: data.lng,
+        alpha2Code: data.alpha2Code,
         photoUrl: data.photoUrl,
         description: data.description.find(el => el.lang === reloadLang).value,
         videoUrl: data.videoUrl,

@@ -19,6 +19,7 @@ const CountrySchema: Schema = new Schema({
   currency: { type: String, required: true },
   lat: { type: Number, required: true },
   lng: { type: Number, required: true },
+  alpha2Code: { type: String, required: true },
   description: [
     {
       lang: { type: String, required: true },
