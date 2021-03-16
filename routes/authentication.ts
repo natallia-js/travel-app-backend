@@ -213,7 +213,7 @@ router.post(
       await user.save();
 
       res.status(201).json({ message: 'User successfully registered',
-                             userId: user._id });
+                             id: user._id });
 
     } catch (e) {
       delUploadedFile();
@@ -269,13 +269,13 @@ router.post(
 
       const token = jwt.sign(
         {
-          userId: user._id,
+          id: user._id,
         },
         config.get(CONFIG_JWT_SECRET_PARAM_NAME)
       );
 
       res.status(201).json({ token,
-                             userId: user._id,
+                             id: user._id,
                              name: user.name,
                              photoUrl: user.photoUrl
                           });
